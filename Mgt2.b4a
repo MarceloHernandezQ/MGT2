@@ -1,0 +1,199 @@
+﻿Build1=Default,b4a.example
+File1=boleto.bal
+File2=buscar.bal
+File3=inicio.bal
+File4=ventas.bal
+FileGroup1=Default Group
+FileGroup2=Default Group
+FileGroup3=Default Group
+FileGroup4=Default Group
+Group=Default Group
+IconFile=
+Library1=core
+Library2=http
+Library3=httputils2
+Library4=xui
+Library5=sql
+Library6=json
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="19" android:targetSdkVersion="28"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~CreateResourceFromFile(Macro, Themes.DarkTheme)~\n~'End of default text.~\n~
+Module1=Starter
+Module2=Venta
+Module3=funciones
+Module4=inicio
+Module5=comun
+Module6=boleto
+NumberOfFiles=4
+NumberOfLibraries=6
+NumberOfModules=6
+Version=9.01
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: ProyectoBeta
+	#VersionCode: 1
+	#VersionName: 
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: unspecified
+	#CanInstallToExternalStorage: False
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: False
+#End Region
+
+Sub Process_Globals
+	'These global variables will be declared once when the application starts.
+	'These variables can be accessed from all modules.
+	Public rutaId As Long
+
+End Sub
+
+Sub Globals
+	'These global variables will be redeclared each time the activity is created.
+	'These variables can only be accessed from this module.
+
+'	Private txBus As EditText
+'	Private Label2 As Label
+		
+
+	Private spBus As Spinner
+	Private spAux As Spinner
+	'Listas
+	Private Lruta As List
+	Private Laux As List 
+	
+	Private spRuta As Spinner
+	Private Button1 As Button
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	'Do not forget to load the layout file created with the visual designer. For example:
+	'Activity.LoadLayout("Layout1")
+	Activity.LoadLayout("inicio")
+	ProgressDialogShow("Cargando Datos...")
+	Cargar_buses
+	Cargar_auxiliar
+	Cargar_rutas
+	ProgressDialogHide
+End Sub
+
+Sub Activity_Resume
+
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+
+End Sub
+
+
+'Sub btBuscar_Click
+'	Dim j As HttpJob
+'	j.Initialize("", Me)
+'	'j.Download2("http://192.168.0.192/Agt2/get_buscarcaratula.aspx", Array As String("n", txBus.Text))
+'	j.Download2("http://192.168.1.83/Agt2/get_buscarcaratula.aspx", Array As String("n", txBus.Text))
+'	wait for (j) jobdone(j As HttpJob)
+'	If j.Success Then
+'	Dim datos As List =  JsonToList(j.GetString)
+'	Label2.Text = datos.Get(0)
+'	'Label2.Text = j.GetString
+'	End If
+'	j.Release
+'End Sub
+
+
+
+Sub Cargar_buses As ResumableSub
+	
+
+	Dim j As HttpJob
+	
+	j.Initialize("", Me)
+	
+	j.Download2("http://192.168.1.83/Agt2/get_buses.aspx", Array As String("bd","gt2"))'localhost'
+	wait for (j) jobdone(j As HttpJob)
+
+	If j.Success Then
+		
+		funciones.list_to_sp(funciones.JobGetRows(j),"codigo",spBus)
+				
+	End If
+	
+	
+	Return True
+	
+End Sub
+
+Sub Cargar_auxiliar As ResumableSub
+	
+	
+	Dim j As HttpJob
+	j.Initialize("", Me)
+	j.Download2("http://192.168.1.83/Agt2/get_auxiliar.aspx", Array As String("bd","gt2"))'localhost'
+	wait for (j) jobdone(j As HttpJob)
+
+	If j.Success Then
+		Laux.Initialize
+		funciones.list_to_sp2(funciones.JobGetRows(j),"codigo", "nombre",spAux,Laux)
+		
+		
+	End If
+	j.Release
+	Return True
+	
+End Sub
+
+Sub Cargar_rutas As ResumableSub
+	
+	
+	Dim j As HttpJob
+	j.Initialize("", Me)
+	j.Download2("http://192.168.1.83/Agt2/get_salidas.aspx", Array As String("bd","gt2"))'localhost'
+	wait for (j) jobdone(j As HttpJob)
+
+	If j.Success Then
+		Lruta.Initialize
+		funciones.list_to_sp2(funciones.JobGetRows(j),"codigo", "nombre",spRuta,Lruta)
+	End If
+	j.Release
+	Return True
+	
+End Sub
+
+Sub lbsbus_LongClick
+	
+End Sub
+
+Sub spBus_ItemClick (Position As Int, Value As Object)
+	
+End Sub
+
+Sub spAux_ItemClick (Position As Int, Value As Object)
+
+
+	
+
+	Msgbox2(spAux.GetItem(Position),"Bienvenido","","CODIGO",Laux.Get(Position),Null)
+	
+	
+	
+	
+End Sub
+
+Sub Label2_Click
+	
+End Sub
+
+Sub Label2_LongClick
+	
+End Sub
+
+Sub Button1_Click
+	StartActivity(Venta)
+	
+End Sub
+
+Sub spRuta_ItemClick (Position As Int, Value As Object)
+	
+	rutaId =  Lruta.Get(Position)
+	
+End Sub
